@@ -1,2 +1,9 @@
-import {supabasePublic} from '../../lib/supabase-server';
-export async function GET(){const sb=supabasePublic();const {data=[]}=await sb.from('robots_rules').select('*').eq('enabled',true).order('sort_order');let last='';const lines=[];for(const r of data){if(r.user_agent!==last){lines.push(`User-agent: ${r.user_agent||'*'}`);last=r.user_agent}lines.push(`${r.directive}: ${r.value||''}`)}lines.push(`Sitemap: ${(process.env.NEXT_PUBLIC_SITE_URL||'https://example.com').replace(/\/$/,'')}/sitemap.xml`);return new Response(lines.join('\n'),{headers:{'content-type':'text/plain; charset=utf-8'}})}
+export default function robots() {
+  return {
+    rules: {
+      userAgent: '*',
+      allow: '/',
+      disallow: '/admin/',
+    },
+  };
+}
