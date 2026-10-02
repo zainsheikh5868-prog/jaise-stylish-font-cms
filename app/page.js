@@ -1,9 +1,32 @@
+import { supabasePublic } from '../lib/supabase-browser';
+import RuntimeIngestor from '../components/RuntimeIngestor';
 import FontGenerator from '../components/FontGenerator';
-import {supabasePublic} from '../lib/supabase-server';
-import RuntimeIngestor,{DynamicSlot} from '../components/RuntimeIngestor';
-export const revalidate=60;
-async function getData(){try{const sb=supabasePublic();const [{data:settings},{data:blocks},{data:faqs}]=await Promise.all([sb.from('site_settings_public').select('*').single(),sb.from('content_blocks').select('key,value').eq('page_path','/').eq('enabled',true),sb.from('faqs').select('question,answer,sort_order').eq('page_path','/').eq('enabled',true).order('sort_order')]);return {settings:settings||{},blocks:Object.fromEntries((blocks||[]).map(x=>[x.key,x.value])),faqs:faqs||[]}}catch{return {settings:{},blocks:{},faqs:[]}}}}
-export default async function Home(){const {settings:s,blocks,faqs}=await getData();const schema={"@context":"https://schema.org","@type":"WebApplication",name:s.site_name||'Stylish Name Generator',applicationCategory:'UtilitiesApplication',operatingSystem:'Any',url:process.env.NEXT_PUBLIC_SITE_URL||'https://example.com'};return <>
-<header className="site-header"><div className="container nav"><div className="brand"><b>✦</b> {s.site_name||'StylishName'}</div><nav className="navlinks"><a href="#generator">Generator</a><a href="/blog">Blog</a><a href="/admin">Admin</a></nav></div></header>
-<RuntimeIngestor/><DynamicSlot slot="header"/><main><section className="hero container"><span className="eyebrow">60+ copyable Unicode styles</span><h1>{blocks.hero_title||'Create stylish names, bios and usernames instantly.'}</h1><p>{blocks.hero_subtitle||s.home_intro||'Type once and get dozens of live, copy-ready styles for games, social profiles, bios and clan names.'}</p></section><section id="generator" className="container"><FontGenerator/></section><section className="section container"><h2>Built for speed and simple use</h2><div className="cards"><article className="card"><h3>Instant conversion</h3><p>Styles are computed locally as you type, so the tool remains responsive and no typing request is sent to the database.</p></article><article className="card"><h3>One-click copy</h3><p>Every result is actual Unicode text, ready to paste into supported apps and games.</p></article><article className="card"><h3>SEO-ready content</h3><p>Admin-managed FAQs, articles, schemas, redirects, crawl rules and metadata flow into the public portal automatically.</p></article></div></section>{faqs.length>0&&<section className="section container"><h2>Frequently asked questions</h2>{faqs.map((f,i)=><details className="card" key={i} style={{marginBottom:10}}><summary><b>{f.question}</b></summary><p>{f.answer}</p></details>)}</section>}<DynamicSlot slot="bottom"/></main>
-<footer className="footer"><div className="container">{s.footer_text||'© StylishName. All rights reserved.'}</div></footer><script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(schema)}}/>{faqs.length>0&&<script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({'@context':'https://schema.org','@type':'FAQPage',mainEntity:faqs.map(f=>({'@type':'Question',name:f.question,acceptedAnswer:{'@type':'Answer',text:f.answer}}))})}}/>}</>}
+
+export const revalidate = 60;
+
+async function getData() {
+  try {
+    const { data: settings } = await supabasePublic
+      .from('site_settings')
+      .select('*')
+      .single();
+    return settings || {};
+  } catch (e) {
+    return {};
+  }
+}
+
+export default async function HomePage() {
+  const settings = await getData();
+
+  return (
+    <>
+      <header className="site-header">
+        <RuntimeIngestor />
+      </header>
+      <main className="container">
+        <FontGenerator settings={settings} />
+      </main>
+    </>
+  );
+}
