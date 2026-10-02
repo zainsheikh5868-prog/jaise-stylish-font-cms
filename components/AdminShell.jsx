@@ -1,0 +1,4 @@
+'use client';
+import {usePathname} from 'next/navigation';
+const nav=[['Dashboard','/admin'],['Pages','/admin/pages'],['Content','/admin/content'],['Blog','/admin/blog'],['SEO','/admin/seo'],['Sitemap','/admin/sitemap'],['Scripts','/admin/scripts'],['Ads','/admin/ads'],['Redirects','/admin/redirects'],['Media','/admin/media'],['FAQs','/admin/faqs'],['Popups','/admin/popups'],['Robots','/admin/robots'],['Backups','/admin/backups'],['Settings','/admin/settings']];
+export default function AdminShell({children}){const path=usePathname();if(path==='/admin/login')return children;return <div className="admin"><aside className="sidebar"><div className="side-logo"><span className="dot"/>Admin</div><nav className="side-nav">{nav.map(([n,h])=><a key={h} href={h}>{n}</a>)}</nav><div style={{marginTop:24}}><a className="notice" href="/">← Public site</a></div></aside><main className="admin-main">{children}</main></div>}

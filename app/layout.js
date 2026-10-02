@@ -1,0 +1,4 @@
+import './globals.css';
+import {supabasePublic} from '../lib/supabase-server';
+export async function generateMetadata(){let m={};try{const {data=[]}=await supabasePublic().from('seo_settings').select('key,value').eq('enabled',true);m=Object.fromEntries(data.map(x=>[x.key,x.value]))}catch{}const base=process.env.NEXT_PUBLIC_SITE_URL||'https://example.com';return {metadataBase:new URL(base),title:{default:m.default_title||'Stylish Name Generator',template:m.title_template||'%s | StylishName'},description:m.default_description||'Generate stylish Unicode names, bios and usernames instantly.',alternates:{canonical:m.canonical_base||base},openGraph:{type:'website',url:base,title:m.default_title||'Stylish Name Generator',description:m.default_description||'Generate stylish Unicode names, bios and usernames instantly.'}}}
+export default function RootLayout({children}){return <html lang="en"><body>{children}</body></html>}

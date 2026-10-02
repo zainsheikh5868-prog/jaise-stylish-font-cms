@@ -1,0 +1,3 @@
+import {supabasePublic} from '../../lib/supabase-server';
+export const revalidate=60;
+export default async function Blog(){let posts=[];try{const {data}=await supabasePublic().from('published_posts').select('slug,title,excerpt,published_at').order('published_at',{ascending:false});posts=data||[]}catch{}return <main className="container section"><a href="/">← Home</a><h1>Blog</h1><div className="cards">{posts.map(p=><article className="card" key={p.slug}><h2><a href={`/blog/${p.slug}`}>{p.title}</a></h2><p>{p.excerpt}</p><small>{p.published_at?new Date(p.published_at).toLocaleDateString():''}</small></article>)}</div></main>}
